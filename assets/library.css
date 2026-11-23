@@ -37,3 +37,4 @@ body {
 .devam[hidden] { display: none; }
 .dugmeler { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
 .alt { max-width: 760px; margin: 0 auto; padding: 0 16px 40px; text-align: center; color: var(--soluk); font-size: 15px; }
+.dugme.kucuk { min-height: 44px; font-size: 15px; padding: 6px 12px; }

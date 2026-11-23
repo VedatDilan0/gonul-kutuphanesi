@@ -115,7 +115,7 @@ html[data-tema="gece"] #kitap.cift #p2 { --omurga: linear-gradient(to right, rgb
 .chip[aria-pressed="true"] { background: var(--vurgu); color: var(--vurgu-yazi); }
 .chip:disabled { opacity: .4; }
 
-#alt #oto { flex: 2.2 1 0; position: relative; min-width: 0; }
+#alt #oto { flex: 3.4 1 0; position: relative; min-width: 0; }
 #alt #oto[hidden] { display: none; }
 #oto button { width: 100%; height: 100%; min-height: 56px; padding: 4px 8px 9px; font-size: 15px; line-height: 1.2; font-weight: bold; color: #fff; background: #7a2a14; border: 2px solid #fff; border-radius: 12px; }
 #oto-cubuk { position: absolute; left: 10px; right: 10px; bottom: 5px; height: 5px; background: rgba(255,255,255,.4); border-radius: 3px; overflow: hidden; pointer-events: none; }
@@ -132,8 +132,29 @@ html[data-tema="gece"] #kitap.cift #p2 { --omurga: linear-gradient(to right, rgb
 .yaprak { position: absolute; top: 0; width: var(--pw); height: var(--ph); transform-style: preserve-3d; -webkit-transform-style: preserve-3d; pointer-events: none; z-index: 5; }
 .yaprak .sayfa { width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; left: 0; }
 .yaprak .arka { transform: rotateY(180deg); }
+.yaprak .sayfa::after {
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; opacity: 0;
+  background: linear-gradient(to right, rgba(40,20,0,0) 0%, rgba(40,20,0,0) 35%, rgba(255,250,235,.28) 68%, rgba(40,20,0,.5) 100%);
+  animation: yaprak-isik .6s cubic-bezier(.4,.05,.25,1) both;
+}
+.yaprak .arka::after { background: linear-gradient(to left, rgba(40,20,0,0) 0%, rgba(40,20,0,0) 35%, rgba(255,250,235,.28) 68%, rgba(40,20,0,.5) 100%); }
+@keyframes yaprak-isik { 0% { opacity: 0; } 50% { opacity: .85; } 100% { opacity: .15; } }
+.yaprak-golge {
+  position: absolute; top: 0; width: var(--pw); height: var(--ph); z-index: 4; pointer-events: none; border-radius: 3px 8px 8px 3px;
+  background: linear-gradient(to right, rgba(30,15,0,.5) 0%, rgba(30,15,0,.2) 35%, rgba(30,15,0,0) 75%);
+  animation: yaprak-golge .6s cubic-bezier(.4,.05,.25,1) both;
+}
+.yaprak-golge.sag { background: linear-gradient(to left, rgba(30,15,0,.5) 0%, rgba(30,15,0,.2) 35%, rgba(30,15,0,0) 75%); }
+@keyframes yaprak-golge { 0% { opacity: 0; } 40% { opacity: 1; } 100% { opacity: 0; } }
 .yuklen { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: center; color: #eadcc0; font-size: 20px; }
+
+@media (max-width: 400px) {
+  #ust > .tus { font-size: 13px; padding: 2px 1px; min-width: 0; }
+  #ust .grup { flex: 0 0 104px; }
+  #ust .grup .tus { min-width: 44px; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   #cubuk i { transition: none; }
+  .yaprak .sayfa::after, .yaprak-golge { animation: none; }
 }

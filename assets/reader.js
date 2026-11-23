@@ -263,8 +263,7 @@
   function cancelAnim() {
     animTok++;
     animating = false;
-    var l = kitap.querySelector('.yaprak');
-    if (l) l.parentNode.removeChild(l);
+    Array.prototype.forEach.call(kitap.querySelectorAll('.yaprak, .yaprak-golge'), function (l) { l.parentNode.removeChild(l); });
     kitap.classList.remove('kayma');
   }
 
@@ -277,14 +276,18 @@
     kitap.classList.remove('kayma');
     void kitap.offsetWidth;
     kitap.classList.add('kayma');
+    if (src !== 'tts') sesCal();
     if (src === 'user') afterUser();
   }
+
+  function sesCal() { if (window.HkSes) window.HkSes.cal(); }
 
   function turn(dir, src) {
     if (animating) return false;
     var step = spread ? 2 : 1, ni = cur + dir * step;
     if (ni < (spread ? -1 : 0) || ni >= pages.length) return false;
     if (src === 'user') setBars(false);
+    if (src !== 'tts') sesCal();
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) {
       cur = ni; render();
@@ -335,6 +338,9 @@
       void leaf.offsetWidth;
       rot = 'rotateY(180deg)';
     }
+    var golge = mk('div', 'yaprak-golge' + (leaf.style.transformOrigin === 'right center' ? ' sag' : ''));
+    golge.style.left = leaf.style.left;
+    kitap.insertBefore(golge, leaf);
     var finished = false;
     function finish() {
       if (finished || tok !== animTok) return;
@@ -342,10 +348,11 @@
       cur = ni;
       render();
       if (leaf.parentNode) leaf.parentNode.removeChild(leaf);
+      if (golge.parentNode) golge.parentNode.removeChild(golge);
       animating = false;
       if (src === 'user') afterUser();
     }
-    leaf.style.transition = 'transform .6s cubic-bezier(.45,.05,.3,1)';
+    leaf.style.transition = 'transform .6s cubic-bezier(.4,.05,.25,1)';
     leaf.style.transform = rot;
     leaf.addEventListener('transitionend', function (ev) { if (ev.target === leaf) finish(); });
     setTimeout(finish, 750);
@@ -426,6 +433,11 @@
     updateFsButtons();
     relayout();
     toast('Yazı boyutu: ' + (i + 1) + ' / ' + FS.length, 1500);
+  }
+  function sayfaSesUI() {
+    var a = window.HkSes ? window.HkSes.acik() : false;
+    $('btn-ses').setAttribute('aria-pressed', a ? 'true' : 'false');
+    $('ses-yazi').textContent = a ? 'Ses: Açık' : 'Ses: Kapalı';
   }
   function setTema(gece) {
     if (gece) document.documentElement.setAttribute('data-tema', 'gece');
@@ -642,6 +654,11 @@
   $('btn-kucult').addEventListener('click', function () { setFs(fsIdx - 1); });
   $('btn-buyut').addEventListener('click', function () { setFs(fsIdx + 1); });
   $('btn-gece').addEventListener('click', function () { setTema(!document.documentElement.hasAttribute('data-tema')); });
+  $('btn-ses').addEventListener('click', function () {
+    if (window.HkSes) window.HkSes.ayarla(!window.HkSes.acik());
+    sayfaSesUI();
+  });
+  if (window.HkSes && window.HkSes.degisince) window.HkSes.degisince(sayfaSesUI);
   $('btn-dinle').addEventListener('click', function () { openPanel('p-dinle', 'btn-dinle'); sesUI(); });
   $('btn-oto').addEventListener('click', function () { openPanel('p-oto', 'btn-oto'); });
   $('ses-basla').addEventListener('click', function () { speakStart(Math.max(cur, 0)); });
@@ -704,6 +721,7 @@
     if (resumed) toast('Kaldığınız yerden devam ediyorsunuz', 2800);
     autoSet(0);
     sesUI();
+    sayfaSesUI();
     if (hasTTS) {
       findVoice();
       if (syn.addEventListener) syn.addEventListener('voiceschanged', findVoice); else syn.onvoiceschanged = findVoice;
